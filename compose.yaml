@@ -1,0 +1,32 @@
+services:
+  postgres:
+    image: horlar/olist-cleaned-data:v0.01
+    container_name: olist_postgres
+    environment:
+      POSTGRES_USER: olist_user
+      POSTGRES_PASSWORD: olist_password
+      POSTGRES_DB: olist_ecommerce
+    ports:
+      - "5434:5432"
+    volumes:
+      - olist_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U olist_user -d olist_ecommerce"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: olist_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  olist_data:
